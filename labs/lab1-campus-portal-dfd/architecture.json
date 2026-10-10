@@ -1,0 +1,55 @@
+{
+  "system_name": "University Campus Student Portal & Grade Registry",
+  "version": "2.4.0",
+  "components": [
+    {
+      "id": "COMP-01",
+      "name": "Student Web & Mobile Browser",
+      "type": "external_entity",
+      "trust_zone": "Public Internet",
+      "description": "Student endpoints accessing course registration, exam timetables, and grades."
+    },
+    {
+      "id": "COMP-02",
+      "name": "Faculty Portal Workstation",
+      "type": "external_entity",
+      "trust_zone": "Campus Wi-Fi / Remote",
+      "description": "Instructor devices submitting grades, assignments, and curriculum updates."
+    },
+    {
+      "id": "COMP-03",
+      "name": "Campus Ingress API Gateway",
+      "type": "process",
+      "trust_zone": "Campus DMZ",
+      "description": "Reverse proxy routing student and faculty requests, terminating TLS."
+    },
+    {
+      "id": "COMP-04",
+      "name": "Student Record Microservice",
+      "type": "process",
+      "trust_zone": "Secure Campus Enclave",
+      "description": "Internal business logic handling course enrollment, degree progression, and GPAs."
+    },
+    {
+      "id": "COMP-05",
+      "name": "PostgreSQL Gradebook Database",
+      "type": "data_store",
+      "trust_zone": "Isolated Database Tier",
+      "description": "Relational database holding student grades, transcripts, and financial status."
+    },
+    {
+      "id": "COMP-06",
+      "name": "HTTPS Student Ingress Flow",
+      "type": "data_flow",
+      "trust_zone": "Public Internet -> Campus DMZ",
+      "description": "REST API traffic containing user credentials, course drop/add commands."
+    },
+    {
+      "id": "COMP-07",
+      "name": "Internal Service-to-Database SQL Flow",
+      "type": "data_flow",
+      "trust_zone": "Enclave -> Database Tier",
+      "description": "Database query flow transmitting grade modification queries and student transcript data."
+    }
+  ]
+}

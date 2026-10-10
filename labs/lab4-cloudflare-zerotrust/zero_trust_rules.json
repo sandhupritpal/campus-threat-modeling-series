@@ -1,0 +1,52 @@
+{
+  "lab": "Lab 4 - Cloudflare Zero Trust Configuration Simulation",
+  "policies": [
+    {
+      "application": "grades-internal.university.edu",
+      "type": "self_hosted",
+      "tunnel_id": "c7a840e1-4321-4899-b1d4-campus-tunnel",
+      "rules": [
+        {
+          "name": "Enforce Faculty Identity Provider & MFA",
+          "action": "allow",
+          "include": [
+            {
+              "email_domain": "faculty.university.edu"
+            }
+          ],
+          "require": [
+            {
+              "auth_method": "fido2_mfa"
+            },
+            {
+              "device_posture": {
+                "os_min_version": "Windows 11 / macOS 14",
+                "disk_encryption": true,
+                "antivirus_active": true
+              }
+            }
+          ]
+        },
+        {
+          "name": "Block Untrusted Geographic Ingress",
+          "action": "block",
+          "include": [
+            {
+              "geo_ip_anomalous": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "gateway_network_rules": [
+        {
+          "name": "Block Malicious Lateral Egress",
+          "action": "block",
+          "description": "Prevents campus endpoints from querying known C2 and phishing domains",
+          "traffic": "dns.security_category in [malware, phishing, cryptomining]"
+        }
+      ]
+    }
+  ]
+}

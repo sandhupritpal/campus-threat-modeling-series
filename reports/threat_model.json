@@ -1,0 +1,524 @@
+{
+  "system_name": "University Campus Student Portal & Grade Registry",
+  "components": [
+    {
+      "id": "COMP-01",
+      "name": "Student Web & Mobile Browser",
+      "type": "external_entity",
+      "description": "Student endpoints accessing course registration, exam timetables, and grades.",
+      "trust_zone": "Public Internet"
+    },
+    {
+      "id": "COMP-02",
+      "name": "Faculty Portal Workstation",
+      "type": "external_entity",
+      "description": "Instructor devices submitting grades, assignments, and curriculum updates.",
+      "trust_zone": "Campus Wi-Fi / Remote"
+    },
+    {
+      "id": "COMP-03",
+      "name": "Campus Ingress API Gateway",
+      "type": "process",
+      "description": "Reverse proxy routing student and faculty requests, terminating TLS.",
+      "trust_zone": "Campus DMZ"
+    },
+    {
+      "id": "COMP-04",
+      "name": "Student Record Microservice",
+      "type": "process",
+      "description": "Internal business logic handling course enrollment, degree progression, and GPAs.",
+      "trust_zone": "Secure Campus Enclave"
+    },
+    {
+      "id": "COMP-05",
+      "name": "PostgreSQL Gradebook Database",
+      "type": "data_store",
+      "description": "Relational database holding student grades, transcripts, and financial status.",
+      "trust_zone": "Isolated Database Tier"
+    },
+    {
+      "id": "COMP-06",
+      "name": "HTTPS Student Ingress Flow",
+      "type": "data_flow",
+      "description": "REST API traffic containing user credentials, course drop/add commands.",
+      "trust_zone": "Public Internet -> Campus DMZ"
+    },
+    {
+      "id": "COMP-07",
+      "name": "Internal Service-to-Database SQL Flow",
+      "type": "data_flow",
+      "description": "Database query flow transmitting grade modification queries and student transcript data.",
+      "trust_zone": "Enclave -> Database Tier"
+    }
+  ],
+  "threats": [
+    {
+      "id": "THR-COMP-01-01",
+      "target_component": "Student Web & Mobile Browser",
+      "component_type": "external_entity",
+      "stride_category": "Spoofing",
+      "title": "Credential Stuffing or Session Hijacking",
+      "description": "An adversary impersonates a legitimate user using stolen credentials or hijacked session cookies.",
+      "impact": "Unauthorized access to student academic records and portal actions.",
+      "recommended_mitigation": "Enforce MFA/FIDO2, short-lived signed session tokens, and IP/device posture binding.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-01-02",
+      "target_component": "Student Web & Mobile Browser",
+      "component_type": "external_entity",
+      "stride_category": "Repudiation",
+      "title": "Unauthenticated Action Repudiation",
+      "description": "A user performs high-risk transactions (e.g. course drops, grade edits) and later denies having initiated them.",
+      "impact": "Inability to maintain non-repudiation in audit investigations.",
+      "recommended_mitigation": "Immutable audit logging, cryptographic digital signatures, and forward-secure log shipping.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-02-01",
+      "target_component": "Faculty Portal Workstation",
+      "component_type": "external_entity",
+      "stride_category": "Spoofing",
+      "title": "Credential Stuffing or Session Hijacking",
+      "description": "An adversary impersonates a legitimate user using stolen credentials or hijacked session cookies.",
+      "impact": "Unauthorized access to student academic records and portal actions.",
+      "recommended_mitigation": "Enforce MFA/FIDO2, short-lived signed session tokens, and IP/device posture binding.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-02-02",
+      "target_component": "Faculty Portal Workstation",
+      "component_type": "external_entity",
+      "stride_category": "Repudiation",
+      "title": "Unauthenticated Action Repudiation",
+      "description": "A user performs high-risk transactions (e.g. course drops, grade edits) and later denies having initiated them.",
+      "impact": "Inability to maintain non-repudiation in audit investigations.",
+      "recommended_mitigation": "Immutable audit logging, cryptographic digital signatures, and forward-secure log shipping.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-03-01",
+      "target_component": "Campus Ingress API Gateway",
+      "component_type": "process",
+      "stride_category": "Spoofing",
+      "title": "Service Identity Impersonation",
+      "description": "Rogue microservice impersonates a trusted backend API worker.",
+      "impact": "Attacker intercepts inter-service RPCs and poisons internal message queues.",
+      "recommended_mitigation": "Deploy mTLS (Mutual TLS) with SPIFFE/SPIRE or Cloudflare Zero Trust service tokens.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-03-02",
+      "target_component": "Campus Ingress API Gateway",
+      "component_type": "process",
+      "stride_category": "Tampering",
+      "title": "Memory or Parameter Tampering (Injection Attacks)",
+      "description": "Malicious payload manipulates backend execution flow via SQLi, command injection, or deserialization.",
+      "impact": "Remote code execution or arbitrary backend database manipulation.",
+      "recommended_mitigation": "Strict input validation, parameterized queries, and least-privilege service containers.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-03-03",
+      "target_component": "Campus Ingress API Gateway",
+      "component_type": "process",
+      "stride_category": "Repudiation",
+      "title": "Log Injection or Log Deletion",
+      "description": "Adversary alters local execution logs or floods log storage to obfuscate unauthorized changes.",
+      "impact": "Failure of compliance audits and lost forensic traceability.",
+      "recommended_mitigation": "Centralized write-once log aggregation with cryptographic log hashing.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-03-04",
+      "target_component": "Campus Ingress API Gateway",
+      "component_type": "process",
+      "stride_category": "Information Disclosure",
+      "title": "Verbose Error Leaks or Memory Exposure",
+      "description": "Application crashes leak stack traces, environment variables, or database connection strings.",
+      "impact": "Attacker acquires reconnaissance details to pivot into deeper network segments.",
+      "recommended_mitigation": "Sanitized error handling, custom generic 500 error pages, and secret management tools (Vault).",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-03-05",
+      "target_component": "Campus Ingress API Gateway",
+      "component_type": "process",
+      "stride_category": "Denial of Service",
+      "title": "Resource Starvation / ReDoS / Algorithmic Complexity Attack",
+      "description": "Excessive or computationally asymmetric requests exhaust CPU, memory, or thread pools.",
+      "impact": "Service outage during high-traffic windows (e.g. course registration rush).",
+      "recommended_mitigation": "Cloudflare DDoS protection, rate limiting, connection pooling, and circuit breakers.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-03-06",
+      "target_component": "Campus Ingress API Gateway",
+      "component_type": "process",
+      "stride_category": "Elevation of Privilege",
+      "title": "Broken Object Level Authorization (BOLA / IDOR)",
+      "description": "Standard student account accesses administrator endpoints by manipulating record IDs.",
+      "impact": "Privilege escalation leading to unauthorized grade modifications or administrative takeover.",
+      "recommended_mitigation": "Enforce RBAC/ABAC authorization checks on every data access query.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-04-01",
+      "target_component": "Student Record Microservice",
+      "component_type": "process",
+      "stride_category": "Spoofing",
+      "title": "Service Identity Impersonation",
+      "description": "Rogue microservice impersonates a trusted backend API worker.",
+      "impact": "Attacker intercepts inter-service RPCs and poisons internal message queues.",
+      "recommended_mitigation": "Deploy mTLS (Mutual TLS) with SPIFFE/SPIRE or Cloudflare Zero Trust service tokens.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-04-02",
+      "target_component": "Student Record Microservice",
+      "component_type": "process",
+      "stride_category": "Tampering",
+      "title": "Memory or Parameter Tampering (Injection Attacks)",
+      "description": "Malicious payload manipulates backend execution flow via SQLi, command injection, or deserialization.",
+      "impact": "Remote code execution or arbitrary backend database manipulation.",
+      "recommended_mitigation": "Strict input validation, parameterized queries, and least-privilege service containers.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-04-03",
+      "target_component": "Student Record Microservice",
+      "component_type": "process",
+      "stride_category": "Repudiation",
+      "title": "Log Injection or Log Deletion",
+      "description": "Adversary alters local execution logs or floods log storage to obfuscate unauthorized changes.",
+      "impact": "Failure of compliance audits and lost forensic traceability.",
+      "recommended_mitigation": "Centralized write-once log aggregation with cryptographic log hashing.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-04-04",
+      "target_component": "Student Record Microservice",
+      "component_type": "process",
+      "stride_category": "Information Disclosure",
+      "title": "Verbose Error Leaks or Memory Exposure",
+      "description": "Application crashes leak stack traces, environment variables, or database connection strings.",
+      "impact": "Attacker acquires reconnaissance details to pivot into deeper network segments.",
+      "recommended_mitigation": "Sanitized error handling, custom generic 500 error pages, and secret management tools (Vault).",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-04-05",
+      "target_component": "Student Record Microservice",
+      "component_type": "process",
+      "stride_category": "Denial of Service",
+      "title": "Resource Starvation / ReDoS / Algorithmic Complexity Attack",
+      "description": "Excessive or computationally asymmetric requests exhaust CPU, memory, or thread pools.",
+      "impact": "Service outage during high-traffic windows (e.g. course registration rush).",
+      "recommended_mitigation": "Cloudflare DDoS protection, rate limiting, connection pooling, and circuit breakers.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-04-06",
+      "target_component": "Student Record Microservice",
+      "component_type": "process",
+      "stride_category": "Elevation of Privilege",
+      "title": "Broken Object Level Authorization (BOLA / IDOR)",
+      "description": "Standard student account accesses administrator endpoints by manipulating record IDs.",
+      "impact": "Privilege escalation leading to unauthorized grade modifications or administrative takeover.",
+      "recommended_mitigation": "Enforce RBAC/ABAC authorization checks on every data access query.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-05-01",
+      "target_component": "PostgreSQL Gradebook Database",
+      "component_type": "data_store",
+      "stride_category": "Tampering",
+      "title": "Unauthorized Direct Database Modification",
+      "description": "Attacker accesses database port directly to alter grade or financial ledgers.",
+      "impact": "Data corruption and academic record integrity compromise.",
+      "recommended_mitigation": "Restrict network access via Cloudflare Tunnels (no exposed public IPs), encrypt at rest.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-05-02",
+      "target_component": "PostgreSQL Gradebook Database",
+      "component_type": "data_store",
+      "stride_category": "Repudiation",
+      "title": "Unlogged Administrative Modifications",
+      "description": "DBA or compromised root account updates database tables directly without logging.",
+      "impact": "Undetectable modification of sensitive records.",
+      "recommended_mitigation": "Enable database-level audit triggers and append-only write logs.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-05-03",
+      "target_component": "PostgreSQL Gradebook Database",
+      "component_type": "data_store",
+      "stride_category": "Information Disclosure",
+      "title": "Data Breach via Backup Exposure or Unencrypted Disk",
+      "description": "Unencrypted backups or unsegmented storage buckets leak student PII and grades.",
+      "impact": "Mass confidentiality breach, FERPA compliance violation.",
+      "recommended_mitigation": "AES-256 database-level column encryption, IAM access controls, and strict DLP.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-05-04",
+      "target_component": "PostgreSQL Gradebook Database",
+      "component_type": "data_store",
+      "stride_category": "Denial of Service",
+      "title": "Storage Exhaustion or Connection Pool Locking",
+      "description": "Unbounded table growth or deadlocks lock database read/write queries.",
+      "impact": "System-wide failure and transaction failures.",
+      "recommended_mitigation": "Disk quotas, query timeout limits, connection pool pooling (PgBouncer), and read replicas.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-06-01",
+      "target_component": "HTTPS Student Ingress Flow",
+      "component_type": "data_flow",
+      "stride_category": "Tampering",
+      "title": "Man-in-the-Middle (MitM) Packet Modification",
+      "description": "Adversary alters unencrypted or weak cipher packets in transit over campus Wi-Fi.",
+      "impact": "Manipulation of student submissions or financial payment parameters.",
+      "recommended_mitigation": "Enforce TLS 1.3 with HSTS and Certificate Pinning.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-06-02",
+      "target_component": "HTTPS Student Ingress Flow",
+      "component_type": "data_flow",
+      "stride_category": "Information Disclosure",
+      "title": "Traffic Eavesdropping / Packet Sniffing",
+      "description": "Unencrypted plaintext HTTP traffic captured over rogue campus access points.",
+      "impact": "Session token and password theft.",
+      "recommended_mitigation": "Zero Trust network policy, WARP client encryption, and mandatory HTTPS.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-06-03",
+      "target_component": "HTTPS Student Ingress Flow",
+      "component_type": "data_flow",
+      "stride_category": "Denial of Service",
+      "title": "SYN Flood / Network Pipe Saturation",
+      "description": "Volumetric attack saturates campus ingress bandwidth.",
+      "impact": "Inability for legitimate users to access on-campus hosted portals.",
+      "recommended_mitigation": "Cloudflare Magic Transit and Anycast DDoS mitigation edge.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-07-01",
+      "target_component": "Internal Service-to-Database SQL Flow",
+      "component_type": "data_flow",
+      "stride_category": "Tampering",
+      "title": "Man-in-the-Middle (MitM) Packet Modification",
+      "description": "Adversary alters unencrypted or weak cipher packets in transit over campus Wi-Fi.",
+      "impact": "Manipulation of student submissions or financial payment parameters.",
+      "recommended_mitigation": "Enforce TLS 1.3 with HSTS and Certificate Pinning.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-07-02",
+      "target_component": "Internal Service-to-Database SQL Flow",
+      "component_type": "data_flow",
+      "stride_category": "Information Disclosure",
+      "title": "Traffic Eavesdropping / Packet Sniffing",
+      "description": "Unencrypted plaintext HTTP traffic captured over rogue campus access points.",
+      "impact": "Session token and password theft.",
+      "recommended_mitigation": "Zero Trust network policy, WARP client encryption, and mandatory HTTPS.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    },
+    {
+      "id": "THR-COMP-07-03",
+      "target_component": "Internal Service-to-Database SQL Flow",
+      "component_type": "data_flow",
+      "stride_category": "Denial of Service",
+      "title": "SYN Flood / Network Pipe Saturation",
+      "description": "Volumetric attack saturates campus ingress bandwidth.",
+      "impact": "Inability for legitimate users to access on-campus hosted portals.",
+      "recommended_mitigation": "Cloudflare Magic Transit and Anycast DDoS mitigation edge.",
+      "dread_score": {
+        "damage_potential": 8,
+        "reproducibility": 7,
+        "exploitability": 7,
+        "affected_users": 8,
+        "discoverability": 7
+      },
+      "status": "Open"
+    }
+  ]
+}
